@@ -1,0 +1,29 @@
+services:
+  auth-api:
+    build:
+      context: ./backend
+    container_name: lco-auth-api
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+    env_file:
+      - ./backend/.env
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+
+  auth-frontend:
+    build:
+      context: ./frontend
+    container_name: lco-auth-frontend
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=development
+      - PORT=3001
+    deploy:
+      resources:
+        limits:
+          memory: 256M

@@ -1,0 +1,675 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "LCO Auth API",
+    "version": "1.4.5",
+    "description": "API de autenticação da plataforma LCO. Gerencia registro, login, verificação via OTP, renovação de tokens e troca de senha."
+  },
+  "servers": [
+    {
+      "url": "https://auth.lco.com.br/api",
+      "description": "Produção"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Auth",
+      "description": "Endpoints de autenticação e gestão de conta"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Access token obtido no endpoint `/auth/login`."
+      }
+    },
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string",
+            "example": "Mensagem de erro"
+          }
+        }
+      },
+      "MessageOk": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "TokenPair": {
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "type": "string",
+            "description": "JWT de curta duração (15 min) para autenticar requisições."
+          },
+          "refreshToken": {
+            "type": "string",
+            "description": "Token opaco de longa duração (30 ou 90 dias) para renovar o access token."
+          }
+        }
+      },
+      "UserProfile": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "fullName": {
+            "type": "string"
+          },
+          "isVerified": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/auth/register": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Registrar novo usuário",
+        "description": "Cria uma conta e envia um código OTP por e-mail para verificação.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email",
+                  "password",
+                  "full_name"
+                ],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "joao@exemplo.com"
+                  },
+                  "password": {
+                    "type": "string",
+                    "minLength": 8,
+                    "example": "Senha@123"
+                  },
+                  "full_name": {
+                    "type": "string",
+                    "minLength": 5,
+                    "example": "João da Silva"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Usuário criado. Um OTP foi enviado ao e-mail informado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Usuário registrado com sucesso"
+                    },
+                    "userId": {
+                      "type": "string",
+                      "format": "uuid"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados inválidos ou e-mail já cadastrado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Autenticar usuário",
+        "description": "Retorna um par de tokens (access + refresh). O e-mail precisa estar verificado.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email",
+                  "password"
+                ],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "joao@exemplo.com"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "Senha@123"
+                  },
+                  "rememberMe": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Se true, o refresh token dura 90 dias (padrão: 30 dias)."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login bem-sucedido.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/TokenPair"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "user": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "format": "uuid"
+                            },
+                            "email": {
+                              "type": "string",
+                              "format": "email"
+                            },
+                            "name": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Falha na autenticação. Dois casos possíveis:",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "Credenciais inválidas": {
+                    "summary": "E-mail ou senha incorretos",
+                    "value": {
+                      "error": "Credenciais inválidas"
+                    }
+                  },
+                  "Email não verificado": {
+                    "summary": "Conta ainda não verificada via OTP",
+                    "value": {
+                      "error": "Email não verificado"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/verify-otp": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Verificar e-mail com OTP",
+        "description": "Ativa a conta do usuário usando o código de 6 dígitos enviado por e-mail no registro.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email",
+                  "code"
+                ],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "code": {
+                    "type": "string",
+                    "minLength": 6,
+                    "maxLength": 6,
+                    "example": "482910"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Conta verificada com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageOk"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Código inválido ou expirado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/resend-otp": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Reenviar OTP de verificação",
+        "description": "Invalida o OTP anterior e envia um novo ao e-mail informado.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email"
+                ],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Código reenviado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageOk"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Usuário não encontrado ou já verificado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/forgot-password": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Solicitar redefinição de senha",
+        "description": "Envia um código OTP ao e-mail para iniciar o fluxo de redefinição. Responde com sucesso mesmo que o e-mail não exista (segurança contra enumeração).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email"
+                ],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Resposta sempre bem-sucedida (segurança).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageOk"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/reset-password": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Redefinir senha com OTP",
+        "description": "Define uma nova senha usando o código OTP recebido por e-mail via `/auth/forgot-password`.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email",
+                  "code",
+                  "newPassword"
+                ],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "code": {
+                    "type": "string",
+                    "minLength": 6,
+                    "maxLength": 6,
+                    "example": "391027"
+                  },
+                  "newPassword": {
+                    "type": "string",
+                    "minLength": 8,
+                    "example": "NovaSenha@456"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Senha redefinida com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageOk"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Código inválido, expirado ou dados incorretos.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/refresh": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Renovar access token",
+        "description": "Troca um refresh token válido por um novo par de tokens. O refresh token usado é imediatamente invalidado (rotação automática).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "refreshToken"
+                ],
+                "properties": {
+                  "refreshToken": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Novos tokens gerados.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenPair"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Refresh token inválido ou expirado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Encerrar sessão",
+        "description": "Revoga o refresh token informado, impedindo futuras renovações.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "refreshToken"
+                ],
+                "properties": {
+                  "refreshToken": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Logout realizado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageOk"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Erro ao revogar o token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/me": {
+      "get": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Dados do usuário autenticado",
+        "description": "Retorna o perfil do usuário dono do access token.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Perfil do usuário.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserProfile"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente, inválido ou expirado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/change-password": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Alterar senha (usuário autenticado)",
+        "description": "Permite que o usuário logado troque sua própria senha informando a senha atual.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "oldPassword",
+                  "newPassword"
+                ],
+                "properties": {
+                  "oldPassword": {
+                    "type": "string",
+                    "example": "SenhaAtual@123"
+                  },
+                  "newPassword": {
+                    "type": "string",
+                    "minLength": 8,
+                    "example": "NovaSenha@456"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Senha alterada com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageOk"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Senha atual incorreta.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente, inválido ou expirado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

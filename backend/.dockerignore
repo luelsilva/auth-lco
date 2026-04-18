@@ -1,0 +1,9 @@
+node_modules
+.git
+.gitignore
+.env
+.env.rar
+*.md
+insomnia_lco_auth.json
+src/db/migrations/delete_tables.sql
+instance-20260407-0737

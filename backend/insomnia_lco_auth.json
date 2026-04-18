@@ -1,0 +1,394 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2026-04-11T20:00:00.000Z",
+  "__export_source": "insomnia.desktop.app:v2023.5.8",
+  "resources": [
+    {
+      "_id": "wrk_lco_auth_api",
+      "parentId": null,
+      "modified": 1712860000000,
+      "created": 1712860000000,
+      "name": "LCO Auth API",
+      "description": "Rotas relacionadas ao sistema de autenticação Bun, Elysia, Drizzle e Supabase",
+      "scope": "collection",
+      "_type": "workspace"
+    },
+    {
+      "_id": "env_dev",
+      "parentId": "wrk_lco_auth_api",
+      "modified": 1712860000000,
+      "created": 1712860000000,
+      "name": "Base Environment",
+      "data": {
+        "base_url": "http://localhost:3000",
+        "token": "SEU_ACCESS_TOKEN_AQUI"
+      },
+      "dataPropertyOrder": {
+        "&": [
+          "base_url",
+          "token"
+        ]
+      },
+      "color": "#7d69cb",
+      "isPrivate": false,
+      "metaSortKey": 1712860000000,
+      "_type": "environment"
+    },
+    {
+      "_id": "fld_auth_public",
+      "parentId": "wrk_lco_auth_api",
+      "modified": 1712860000000,
+      "created": 1712860000000,
+      "name": "Autenticação (Pública)",
+      "description": "",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1712860000000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_auth_private",
+      "parentId": "wrk_lco_auth_api",
+      "modified": 1712860000000,
+      "created": 1712860000000,
+      "name": "Autenticação (Privada / Logado)",
+      "description": "",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1712860000001,
+      "_type": "request_group"
+    },
+    {
+      "_id": "req_register",
+      "parentId": "fld_auth_public",
+      "modified": 1712860000000,
+      "created": 1712860000000,
+      "url": "{{ _.base_url }}/api/auth/register",
+      "name": "Registrar Usuário",
+      "description": "",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n\t\"email\": \"usuario@teste.com\",\n\t\"password\": \"minhasenha123\",\n\t\"full_name\": \"Fulano de Tal\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1712860000000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_login",
+      "parentId": "fld_auth_public",
+      "modified": 1712860000000,
+      "created": 1712860000000,
+      "url": "{{ _.base_url }}/api/auth/login",
+      "name": "Login",
+      "description": "",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n\t\"email\": \"usuario@teste.com\",\n\t\"password\": \"minhasenha123\",\n\t\"rememberMe\": true\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1712860000001,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_verify_otp",
+      "parentId": "fld_auth_public",
+      "modified": 1712860000000,
+      "created": 1712860000000,
+      "url": "{{ _.base_url }}/api/auth/verify-otp",
+      "name": "Verificar OTP",
+      "description": "",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n\t\"email\": \"usuario@teste.com\",\n\t\"code\": \"123456\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1712860000002,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_resend_otp",
+      "parentId": "fld_auth_public",
+      "modified": 1712860000000,
+      "created": 1712860000000,
+      "url": "{{ _.base_url }}/api/auth/resend-otp",
+      "name": "Reenviar OTP",
+      "description": "",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n\t\"email\": \"usuario@teste.com\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1712860000003,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_forgot_password",
+      "parentId": "fld_auth_public",
+      "modified": 1712860000000,
+      "created": 1712860000000,
+      "url": "{{ _.base_url }}/api/auth/forgot-password",
+      "name": "Esqueci a Senha",
+      "description": "",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n\t\"email\": \"usuario@teste.com\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1712860000004,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_reset_password",
+      "parentId": "fld_auth_public",
+      "modified": 1712860000000,
+      "created": 1712860000000,
+      "url": "{{ _.base_url }}/api/auth/reset-password",
+      "name": "Resetar Senha",
+      "description": "",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n\t\"email\": \"usuario@teste.com\",\n\t\"code\": \"123456\",\n\t\"newPassword\": \"novaSenha1234\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1712860000005,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_refresh",
+      "parentId": "fld_auth_public",
+      "modified": 1712860000000,
+      "created": 1712860000000,
+      "url": "{{ _.base_url }}/api/auth/refresh",
+      "name": "Refresh Token",
+      "description": "",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n\t\"refreshToken\": \"SEU_REFRESH_TOKEN_AQUI\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1712860000006,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_logout",
+      "parentId": "fld_auth_public",
+      "modified": 1712860000000,
+      "created": 1712860000000,
+      "url": "{{ _.base_url }}/api/auth/logout",
+      "name": "Logout",
+      "description": "",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n\t\"refreshToken\": \"SEU_REFRESH_TOKEN_AQUI\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1712860000007,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_me",
+      "parentId": "fld_auth_private",
+      "modified": 1712860000000,
+      "created": 1712860000000,
+      "url": "{{ _.base_url }}/api/auth/me",
+      "name": "Meu Perfil (/me)",
+      "description": "",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token }}"
+      },
+      "metaSortKey": -1712860000000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_change_password",
+      "parentId": "fld_auth_private",
+      "modified": 1712860000000,
+      "created": 1712860000000,
+      "url": "{{ _.base_url }}/api/auth/change-password",
+      "name": "Mudar Senha",
+      "description": "",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n\t\"oldPassword\": \"minhasenha123\",\n\t\"newPassword\": \"novaSenhaSuperForte\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token }}"
+      },
+      "metaSortKey": -1712860000001,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_root",
+      "parentId": "wrk_lco_auth_api",
+      "modified": 1712860000000,
+      "created": 1712860000000,
+      "url": "{{ _.base_url }}/",
+      "name": "API Healthcheck",
+      "description": "",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": -1712860000002,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    }
+  ]
+}

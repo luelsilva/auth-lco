@@ -1,0 +1,17 @@
+services:
+  auth-api:
+    build:
+      network: host
+    network_mode: host
+    restart: always
+    environment:
+      - NODE_ENV=production
+
+  auth-frontend:
+    build:
+      network: host
+    network_mode: host
+    restart: always
+    environment:
+      - NODE_ENV=production
+      - PORT=3001

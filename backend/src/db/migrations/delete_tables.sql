@@ -1,0 +1,14 @@
+DO $$ 
+DECLARE 
+    r RECORD;
+BEGIN
+    -- Deletar todas as tabelas
+    FOR r IN (SELECT tablename FROM pg_tables WHERE schemaname = 'public') LOOP
+        EXECUTE 'DROP TABLE IF EXISTS ' || quote_ident(r.tablename) || ' CASCADE';
+    END LOOP;
+    
+    -- Deletar todos os enums
+    FOR r IN (SELECT typname FROM pg_type t JOIN pg_namespace n ON n.oid = t.typnamespace WHERE n.nspname = 'public' AND t.typtype = 'e') LOOP
+        EXECUTE 'DROP TYPE IF EXISTS ' || quote_ident(r.typname) || ' CASCADE';
+    END LOOP;
+END $$;

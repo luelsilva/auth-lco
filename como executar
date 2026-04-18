@@ -1,0 +1,15 @@
+Como usar:
+
+1. No Windows (Local)
+   Basta rodar o comando padrão (lembre-se de abrir o Docker Desktop antes):
+
+docker compose up -d --build
+
+Backend: http://localhost:3000
+Frontend: http://localhost:3001
+
+2. Na OCI (Ampere ou AMD)
+   Use os dois arquivos juntos.
+   O segundo arquivo vai aplicar as configurações de performance por cima do primeiro:
+
+docker compose -f docker-compose.yml -f docker-compose.oci.yml up -d --build
