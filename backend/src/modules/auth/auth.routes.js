@@ -56,7 +56,10 @@ function extractReqCtx(req) {
 // ── Router ─────────────────────────────────────────────────────────────────
 
 export async function handleAuthRoutes(req, fullPath) {
-    const path = fullPath.replace('/api/auth', '') || '/';
+    let path = fullPath.replace('/api/auth', '') || '/';
+    if (path.length > 1 && path.endsWith('/')) {
+        path = path.slice(0, -1);
+    }
     const method = req.method;
     const reqCtx = extractReqCtx(req);
 

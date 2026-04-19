@@ -55,7 +55,21 @@ export async function attemptRefresh() {
     return false;
 }
 
-export function logout() {
+export async function logout() {
+    const refreshToken = localStorage.getItem('refreshToken');
+    if (refreshToken) {
+        try {
+            // Tenta avisar o backend, mas não trava o fluxo se der erro
+            await fetch(`${BASE_URL}/auth/logout`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ refreshToken })
+            });
+        } catch (e) {
+            console.error('Erro ao deslogar no servidor', e);
+        }
+    }
+
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
     window.location.href = '/login';

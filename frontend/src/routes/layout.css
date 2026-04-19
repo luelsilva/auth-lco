@@ -332,3 +332,20 @@ body {
 .logout-btn:hover {
 	background-color: rgba(239, 68, 68, 0.1) !important;
 }
+
+.actions-row {
+	display: flex;
+	gap: 1rem;
+	margin-top: 1rem;
+}
+
+.actions-row .btn {
+	flex: 1;
+}
+
+.change-password-section h3 {
+	margin-bottom: 1.5rem;
+	color: var(--text-primary);
+	font-weight: 600;
+}
+

@@ -22,6 +22,7 @@
 			const data = await res.json();
 			
 			if (!res.ok) {
+				console.error('[REGISTER ERROR]', data);
 				errorMsg = data.error || 'Erro ao registrar. Verifique os dados.';
 				return;
 			}

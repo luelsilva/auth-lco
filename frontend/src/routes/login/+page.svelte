@@ -58,7 +58,10 @@
 			</div>
 			
 			<div class="form-group">
-				<label for="password">Senha</label>
+				<div style="display: flex; justify-content: space-between; align-items: center;">
+					<label for="password">Senha</label>
+					<a href="/forgot-password" class="btn-link" style="font-size: 0.8rem;">Esqueceu a senha?</a>
+				</div>
 				<div class="password-container">
 					<input 
 						type={showPassword ? "text" : "password"} 

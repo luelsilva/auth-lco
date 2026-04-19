@@ -58,7 +58,7 @@ Bun.serve({
 
         // Log de requisição para debug de CORS/Conexão
         const origin = req.headers.get('Origin');
-        // console.log(`[${new Date().toISOString()}] ${req.method} ${pathname} - Origin: ${origin || 'N/A'}`);
+        console.log(`[${new Date().toISOString()}] ${req.method} ${pathname} - Origin: ${origin || 'N/A'}`);
 
         // Preflight CORS
         if (req.method === 'OPTIONS') {

@@ -9,8 +9,14 @@ import { logActivity } from '../../services/activityLogger.js';
 
 export class AuthService {
     static async registerUser({ email, password, full_name }, reqCtx = {}) {
-        const normalizedEmail = email.toLowerCase();
-        const formattedFullName = formatarNome(full_name);
+        const normalizedEmail = email.trim().toLowerCase();
+        const formattedFullName = formatarNome(full_name.trim());
+
+        // Verificar se já existe
+        const [existing] = await db.select().from(profiles).where(eq(profiles.email, normalizedEmail)).limit(1);
+        if (existing) {
+            throw new Error('Este e-mail já está cadastrado.');
+        }
 
         // Hash Nativo do Bun (Mais rápido)
         const hashedPassword = await Bun.password.hash(password);
