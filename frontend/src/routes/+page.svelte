@@ -1,8 +1,12 @@
-<script lang="ts">
+	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
+	import { isAuthenticated } from '$lib/api';
 
-	// Svelte reactive block for changing routes via the old buttons
-	// We've already replaced layout.css to have global styles, so we can use them!
+	onMount(() => {
+		if (isAuthenticated()) {
+			goto('/dashboard');
+		}
+	});
 
 	function handleLogin() {
 		goto('/login');

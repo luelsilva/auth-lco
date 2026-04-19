@@ -1,6 +1,6 @@
-<script lang="ts">
+	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { apiFetch } from '$lib/api';
+	import { apiFetch, isAuthenticated } from '$lib/api';
 
 	let email = $state('');
 	let password = $state('');
@@ -9,6 +9,12 @@
 	let isLoading = $state(false);
 
 	let showPassword = $state(false);
+
+	onMount(() => {
+		if (isAuthenticated()) {
+			goto('/dashboard');
+		}
+	});
 
 	async function handleSubmit(e: Event) {
 		e.preventDefault();
