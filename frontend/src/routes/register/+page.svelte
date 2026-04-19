@@ -40,7 +40,7 @@
 <main class="landing-container">
 	<div class="glass-card auth-card">
 		<h2 class="logo" style="font-size: 2rem;">Criar Conta</h2>
-		<p class="subtitle" style="margin-bottom: 1.5rem;">Crie sua conta na LCO Sistemas</p>
+		<p class="subtitle" style="margin-bottom: 1.5rem;">Crie sua conta na LCO Sistemas <span class="version-text">v1.5.0</span></p>
 		
 		{#if errorMsg}
 			<div class="error-msg">{errorMsg}</div>

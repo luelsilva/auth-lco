@@ -44,7 +44,7 @@
 
 <main class="landing-container">
 	<div class="glass-card auth-card">
-		<h2 class="logo" style="font-size: 2rem;">Acessar</h2>
+		<h2 class="logo" style="font-size: 2rem;">Acessar <span class="version-text">v1.5.0</span></h2>
 		<p class="subtitle" style="margin-bottom: 1.5rem;">Preencha seus dados para continuar</p>
 		
 		{#if errorMsg}
