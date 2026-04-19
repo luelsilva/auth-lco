@@ -13,3 +13,5 @@ Frontend: http://localhost:3001
    O segundo arquivo vai aplicar as configurações de performance por cima do primeiro:
 
 docker compose -f docker-compose.yml -f docker-compose.oci.yml up -d --build
+
+Obs: Para o Cloudflare Tunnel funcionar na OCI, você deve preencher o `TUNNEL_TOKEN` no arquivo `backend/.env`.

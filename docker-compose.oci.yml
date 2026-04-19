@@ -15,3 +15,14 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3001
+
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    container_name: lco-auth-tunnel
+    restart: always
+    network_mode: host
+    command: tunnel --no-autoupdate run
+    env_file:
+      - ./backend/.env
+    environment:
+      - TUNNEL_TOKEN=${TUNNEL_TOKEN}
