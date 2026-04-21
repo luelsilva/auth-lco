@@ -16,6 +16,16 @@ services:
       - NODE_ENV=production
       - PORT=3001
 
+  site-lco:
+    build:
+      context: ./site-lco
+      network: host
+    network_mode: host
+    restart: always
+    environment:
+      - NODE_ENV=production
+      - PORT=3002
+
   tunnel:
     image: cloudflare/cloudflared:latest
     container_name: lco-auth-tunnel

@@ -6,7 +6,8 @@ Como usar:
 docker compose up -d --build
 
 Backend: http://localhost:3000
-Frontend: http://localhost:3001
+Frontend (Auth): http://localhost:3001
+Site LCO: http://localhost:3002
 
 2. Na OCI (Ampere ou AMD)
    Use os dois arquivos juntos.

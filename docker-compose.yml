@@ -27,3 +27,17 @@ services:
       resources:
         limits:
           memory: 256M
+
+  site-lco:
+    build:
+      context: ./site-lco
+    container_name: lco-site
+    ports:
+      - "3002:3002"
+    environment:
+      - NODE_ENV=development
+      - PORT=3002
+    deploy:
+      resources:
+        limits:
+          memory: 256M
