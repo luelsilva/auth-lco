@@ -10,7 +10,7 @@ const getCorsHeaders = (req) => {
     return {
         'Access-Control-Allow-Origin': allowedOrigin,
         'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-app-id',
         'Access-Control-Max-Age': '86400',
     };
 };
@@ -57,8 +57,8 @@ Bun.serve({
         const { pathname } = new URL(req.url);
 
         // Log de requisição para debug de CORS/Conexão
-        const origin = req.headers.get('Origin');
-        console.log(`[${new Date().toISOString()}] ${req.method} ${pathname} - Origin: ${origin || 'N/A'}`);
+        // const origin = req.headers.get('Origin');
+        // console.log(`[${new Date().toISOString()}] ${req.method} ${pathname} - Origin: ${origin || 'N/A'}`);
 
         // Preflight CORS
         if (req.method === 'OPTIONS') {
