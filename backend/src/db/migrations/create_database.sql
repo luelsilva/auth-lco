@@ -1,36 +1,47 @@
--- ============================================
--- SQL COMPLETO PARA CRIAR O BANCO DE DADOS
--- Sistema de Autenticação com OTP
--- ============================================
 
--- Habilitar extensões necessárias
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+-- ============================================
+-- FUNÇÃO: uuid_generate_v7
+-- Gera UUIDs v7 (ordenados por tempo) para melhor performance de índices.
+-- ============================================
+CREATE OR REPLACE FUNCTION uuid_generate_v7()
+RETURNS uuid AS $$
+DECLARE
+  v_time timestamp with time zone:= clock_timestamp();
+  v_msec bigint := floor(extract(epoch from v_time) * 1000);
+  v_uuid_hex text;
+BEGIN
+  -- 48 bits para o timestamp (ms) + Versão 7 + 12 bits random + Variant + 62 bits random
+  v_uuid_hex := lpad(to_hex(v_msec), 12, '0') || '7' || substr(to_hex(floor(random() * 4096)::int), 1, 3) || 
+                encode(gen_random_bytes(8), 'hex');
+  
+  -- Ajustar a variante (RFC 4122) para os bits 64-65 serem 10 (8, 9, a, ou b em hex)
+  -- Simplificando: o 17º caractere (índice 16) deve ser 8, 9, a ou b.
+  -- Aqui pegamos o hex gerado e forçamos a variante correta.
+  RETURN (substr(v_uuid_hex, 1, 16) || 
+          CASE WHEN (floor(random()*4)::int) = 0 THEN '8' 
+               WHEN (floor(random()*4)::int) = 1 THEN '9' 
+               WHEN (floor(random()*4)::int) = 2 THEN 'a' 
+               ELSE 'b' END || 
+          substr(v_uuid_hex, 18, 15))::uuid;
+END;
+$$ LANGUAGE plpgsql VOLATILE SET search_path = public;
 
--- Criação dos ENUMs (com blocos separados para garantir a criação independente)
+-- Criação dos ENUMs
 DO $$ BEGIN
     CREATE TYPE otp_type AS ENUM ('registration', 'password_reset');
 EXCEPTION WHEN duplicate_object THEN null; END $$;
 
-
-
 -- ============================================
 -- TABELA: keep_alive
--- Mantém o banco ativo para evitar congelamento do Supabase.
--- agora no painel do supabase vá em interações e procure por cron
--- crie um novo job e configure para uma vez por dia
--- coloque a função sql abaixo no cron
---
---  INSERT INTO keep_alive DEFAULT VALUES;
---
 -- ============================================
 CREATE TABLE IF NOT EXISTS keep_alive (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v7(),
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 -- Tabela de Perfis de Usuários
 CREATE TABLE IF NOT EXISTS profiles (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v7(),
     email TEXT NOT NULL UNIQUE,
     password_hash TEXT NOT NULL,
     full_name TEXT,
@@ -43,7 +54,7 @@ CREATE TABLE IF NOT EXISTS profiles (
 
 -- Tabela de Códigos OTP
 CREATE TABLE IF NOT EXISTS otp_codes (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v7(),
     user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
     code TEXT NOT NULL,
     type otp_type NOT NULL,
@@ -53,7 +64,7 @@ CREATE TABLE IF NOT EXISTS otp_codes (
 
 -- Tabela de Refresh Tokens
 CREATE TABLE IF NOT EXISTS refresh_tokens (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v7(),
     user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
     token_hash TEXT NOT NULL UNIQUE,
     expires_at TIMESTAMPTZ NOT NULL,
@@ -61,13 +72,9 @@ CREATE TABLE IF NOT EXISTS refresh_tokens (
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- ============================================
--- TABELA: activity_logs
--- Registra ações relevantes dos usuários.
--- source_app é informado pelo cliente via header X-App-ID.
--- ============================================
+-- Tabela de Log de Atividades
 CREATE TABLE IF NOT EXISTS activity_logs (
-    id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id         UUID PRIMARY KEY DEFAULT uuid_generate_v7(),
     user_id    UUID REFERENCES profiles(id) ON DELETE SET NULL,
     action     TEXT NOT NULL,
     source_app TEXT NOT NULL DEFAULT 'unknown',
@@ -80,16 +87,9 @@ CREATE TABLE IF NOT EXISTS activity_logs (
 -- Índices para melhorar performance
 CREATE INDEX IF NOT EXISTS idx_profiles_email ON profiles(email);
 CREATE INDEX IF NOT EXISTS idx_otp_codes_user_id ON otp_codes(user_id);
-CREATE INDEX IF NOT EXISTS idx_otp_codes_type ON otp_codes(type);
-CREATE INDEX IF NOT EXISTS idx_otp_codes_expires_at ON otp_codes(expires_at);
 CREATE INDEX IF NOT EXISTS idx_refresh_tokens_user_id ON refresh_tokens(user_id);
-CREATE INDEX IF NOT EXISTS idx_refresh_tokens_token_hash ON refresh_tokens(token_hash);
-CREATE INDEX IF NOT EXISTS idx_refresh_tokens_expires_at ON refresh_tokens(expires_at);
 CREATE INDEX IF NOT EXISTS idx_activity_logs_user_id ON activity_logs(user_id);
-CREATE INDEX IF NOT EXISTS idx_activity_logs_action ON activity_logs(action);
-CREATE INDEX IF NOT EXISTS idx_activity_logs_source_app ON activity_logs(source_app);
 CREATE INDEX IF NOT EXISTS idx_activity_logs_created_at ON activity_logs(created_at DESC);
-
 
 -- Trigger para atualizar updated_at automaticamente
 CREATE OR REPLACE FUNCTION update_updated_at_column()
@@ -99,7 +99,6 @@ BEGIN
     RETURN NEW;
 END;
 $$ language 'plpgsql' SET search_path = public;
-
 
 DROP TRIGGER IF EXISTS update_profiles_updated_at ON profiles;
 CREATE TRIGGER update_profiles_updated_at 
