@@ -20,7 +20,7 @@
 
 <main class="landing-container">
 	<div class="glass-card">
-		<h1 class="logo">LCO Sistemas <span class="version-text">v1.5.0</span></h1>
+		<h1 class="logo">LCO Sistemas <span class="version-text">v1.6.0</span></h1>
 		<p class="subtitle">Bem-vindo. Acesse ou crie sua conta para continuar.</p>
 		<div class="actions">
 			<button class="btn btn-primary" onclick={handleLogin}>Fazer login</button>

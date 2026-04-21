@@ -70,7 +70,7 @@
 			<div class="error-msg">{errorMsg}</div>
 			<button class="btn btn-secondary" onclick={() => goto('/login')}>Voltar ao Login</button>
 		{:else if user}
-			<h2 class="logo" style="font-size: 2rem;">Área Logada <span class="version-text">v1.5.0</span></h2>
+			<h2 class="logo" style="font-size: 2rem;">Área Logada <span class="version-text">v1.6.0</span></h2>
 			
 			{#if isChangingPassword}
 				<div class="change-password-section">
