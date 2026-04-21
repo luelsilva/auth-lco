@@ -1,30 +1,11 @@
+-- ============================================
+-- SQL COMPLETO PARA CRIAR O BANCO DE DADOS
+-- Sistema de Autenticação com OTP
+-- ============================================
 
--- ============================================
--- FUNÇÃO: uuid_generate_v7
--- Gera UUIDs v7 (ordenados por tempo) para melhor performance de índices.
--- ============================================
-CREATE OR REPLACE FUNCTION uuid_generate_v7()
-RETURNS uuid AS $$
-DECLARE
-  v_time timestamp with time zone:= clock_timestamp();
-  v_msec bigint := floor(extract(epoch from v_time) * 1000);
-  v_uuid_hex text;
-BEGIN
-  -- 48 bits para o timestamp (ms) + Versão 7 + 12 bits random + Variant + 62 bits random
-  v_uuid_hex := lpad(to_hex(v_msec), 12, '0') || '7' || substr(to_hex(floor(random() * 4096)::int), 1, 3) || 
-                encode(gen_random_bytes(8), 'hex');
-  
-  -- Ajustar a variante (RFC 4122) para os bits 64-65 serem 10 (8, 9, a, ou b em hex)
-  -- Simplificando: o 17º caractere (índice 16) deve ser 8, 9, a ou b.
-  -- Aqui pegamos o hex gerado e forçamos a variante correta.
-  RETURN (substr(v_uuid_hex, 1, 16) || 
-          CASE WHEN (floor(random()*4)::int) = 0 THEN '8' 
-               WHEN (floor(random()*4)::int) = 1 THEN '9' 
-               WHEN (floor(random()*4)::int) = 2 THEN 'a' 
-               ELSE 'b' END || 
-          substr(v_uuid_hex, 18, 15))::uuid;
-END;
-$$ LANGUAGE plpgsql VOLATILE SET search_path = public;
+-- Habilitar extensões necessárias
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
 -- Criação dos ENUMs
 DO $$ BEGIN
@@ -35,13 +16,13 @@ EXCEPTION WHEN duplicate_object THEN null; END $$;
 -- TABELA: keep_alive
 -- ============================================
 CREATE TABLE IF NOT EXISTS keep_alive (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v7(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 -- Tabela de Perfis de Usuários
 CREATE TABLE IF NOT EXISTS profiles (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v7(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     email TEXT NOT NULL UNIQUE,
     password_hash TEXT NOT NULL,
     full_name TEXT,
@@ -54,7 +35,7 @@ CREATE TABLE IF NOT EXISTS profiles (
 
 -- Tabela de Códigos OTP
 CREATE TABLE IF NOT EXISTS otp_codes (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v7(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
     code TEXT NOT NULL,
     type otp_type NOT NULL,
@@ -64,7 +45,7 @@ CREATE TABLE IF NOT EXISTS otp_codes (
 
 -- Tabela de Refresh Tokens
 CREATE TABLE IF NOT EXISTS refresh_tokens (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v7(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
     token_hash TEXT NOT NULL UNIQUE,
     expires_at TIMESTAMPTZ NOT NULL,
@@ -74,7 +55,7 @@ CREATE TABLE IF NOT EXISTS refresh_tokens (
 
 -- Tabela de Log de Atividades
 CREATE TABLE IF NOT EXISTS activity_logs (
-    id         UUID PRIMARY KEY DEFAULT uuid_generate_v7(),
+    id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id    UUID REFERENCES profiles(id) ON DELETE SET NULL,
     action     TEXT NOT NULL,
     source_app TEXT NOT NULL DEFAULT 'unknown',

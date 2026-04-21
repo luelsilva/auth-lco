@@ -1,3 +1,4 @@
+import { v7 as uuidv7 } from 'uuid';
 import { db } from '../../db/index.js';
 import { profiles, otpCodes, refreshTokens } from '../../db/schema.js';
 import { eq, and, isNull, gt } from 'drizzle-orm';
@@ -22,6 +23,7 @@ export class AuthService {
         const hashedPassword = await Bun.password.hash(password);
 
         const [user] = await db.insert(profiles).values({
+            id: uuidv7(),
             email: normalizedEmail,
             passwordHash: hashedPassword,
             fullName: formattedFullName
@@ -29,6 +31,7 @@ export class AuthService {
 
         const otp = generateOTP();
         await db.insert(otpCodes).values({
+            id: uuidv7(),
             userId: user.id,
             code: otp,
             type: 'registration',
@@ -106,6 +109,7 @@ export class AuthService {
 
         const otp = generateOTP();
         await db.insert(otpCodes).values({
+            id: uuidv7(),
             userId: user.id,
             code: otp,
             type: 'registration',
@@ -129,6 +133,7 @@ export class AuthService {
 
         const otp = generateOTP();
         await db.insert(otpCodes).values({
+            id: uuidv7(),
             userId: user.id,
             code: otp,
             type: 'password_reset',

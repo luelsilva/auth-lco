@@ -1,3 +1,4 @@
+import { v7 as uuidv7 } from 'uuid';
 import { db } from '../db/index.js';
 import { activityLogs } from '../db/schema.js';
 
@@ -12,11 +13,13 @@ import { activityLogs } from '../db/schema.js';
  * @param {string|null} params.userAgent
  * @param {object|null} params.metadata    - Dados extras livres por tipo de ação
  */
-export async function logActivity({ userId = null, action, ipAddress = null, userAgent = null, metadata = null }) {
+export async function logActivity({ userId = null, action, sourceApp = 'unknown', ipAddress = null, userAgent = null, metadata = null }) {
     try {
         await db.insert(activityLogs).values({
+            id: uuidv7(),
             userId,
             action,
+            sourceApp,
             ipAddress,
             userAgent,
             metadata,

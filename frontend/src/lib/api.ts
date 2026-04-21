@@ -1,10 +1,11 @@
-import { PUBLIC_API_URL } from '$env/static/public';
+import { PUBLIC_API_URL, PUBLIC_APP_NAME } from '$env/static/public';
 
 const BASE_URL = PUBLIC_API_URL;
 
 export async function apiFetch(endpoint: string, options: RequestInit = {}) {
     const headers = new Headers(options.headers || {});
     headers.set('Content-Type', 'application/json');
+    headers.set('X-App-ID', PUBLIC_APP_NAME);
 
     const accessToken = localStorage.getItem('accessToken');
     if (accessToken) {
@@ -39,7 +40,8 @@ export async function attemptRefresh() {
         const res = await fetch(`${BASE_URL}/auth/refresh`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'X-App-ID': PUBLIC_APP_NAME
             },
             body: JSON.stringify({ refreshToken })
         });
@@ -62,7 +64,10 @@ export async function logout() {
             // Tenta avisar o backend, mas não trava o fluxo se der erro
             await fetch(`${BASE_URL}/auth/logout`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'X-App-ID': PUBLIC_APP_NAME
+                },
                 body: JSON.stringify({ refreshToken })
             });
         } catch (e) {

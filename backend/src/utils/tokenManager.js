@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import { v7 as uuidv7 } from 'uuid';
 import crypto from 'crypto';
 import config from '../config.js';
 import { db } from '../db/index.js';
@@ -31,6 +32,7 @@ export async function generateRefreshToken(userId, rememberMe = false) {
 
     // Salvar no banco
     await db.insert(refreshTokens).values({
+        id: uuidv7(),
         userId,
         tokenHash,
         expiresAt

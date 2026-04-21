@@ -46,6 +46,7 @@ function extractUser(req) {
 
 function extractReqCtx(req) {
     return {
+        sourceApp: req.headers.get('x-app-id') ?? 'unknown',
         ipAddress: req.headers.get('x-forwarded-for')?.split(',')[0].trim()
                 ?? req.headers.get('x-real-ip')
                 ?? null,
