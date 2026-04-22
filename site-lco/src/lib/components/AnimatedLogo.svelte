@@ -1,15 +1,17 @@
 <script lang="ts">
   import { onMount } from 'svelte';
 
-  export let src = '/lco-brand-logo-3d.png';
-  export let alt = 'LCO 3D Logo';
-  export let size = '400px';
+  let { 
+    src = '/lco-brand-logo-3d.png', 
+    alt = 'LCO 3D Logo', 
+    size = '400px' 
+  } = $props();
 
   let container: HTMLDivElement;
-  let rotateX = 0;
-  let rotateY = 0;
-  let shineX = 0;
-  let isHovered = false;
+  let rotateX = $state(0);
+  let rotateY = $state(0);
+  let shineX = $state(0);
+  let isHovered = $state(false);
 
   function handleMouseMove(e: MouseEvent) {
     if (!container) return;
