@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import AnimatedLogo from '$lib/components/AnimatedLogo.svelte';
 
   const services = [
     {
@@ -54,7 +55,7 @@
 <header class="header {scrolled ? 'scrolled' : ''}">
   <div class="container nav-container">
     <div class="logo-area">
-      <img src="/lco-brand-logo.svg" alt="LCO Systems Logo" class="logo-img" />
+      <AnimatedLogo size="80px" />
       <span class="logo-text">LCO Systems</span>
     </div>
     <nav class="nav">
@@ -73,13 +74,18 @@
 <section id="home" class="hero">
   <div class="hero-bg" style="background-image: linear-gradient(rgba(10, 37, 64, 0.8), rgba(10, 37, 64, 0.8)), url('/hero.png');"></div>
   <div class="container hero-content">
-    <div class="hero-text">
-       <h1>Engenharia de <span class="highlight">Precisão</span> para o Futuro</h1>
-       <p>Soluções completas em projetos elétricos, automação, IOT e energias renováveis com a marca LCO Systems.</p>
-       <div class="hero-actions">
-         <a href="#services" class="btn btn-primary">Nossos Serviços</a>
-         <a href="#about" class="btn btn-outline">Saiba Mais</a>
-       </div>
+    <div class="hero-layout">
+      <div class="hero-text">
+         <h1>Engenharia de <span class="highlight">Precisão</span> para o Futuro</h1>
+         <p>Soluções completas em projetos elétricos, automação, IOT e energias renováveis com a marca LCO Systems.</p>
+         <div class="hero-actions">
+           <a href="#services" class="btn btn-primary">Nossos Serviços</a>
+           <a href="#about" class="btn btn-outline">Saiba Mais</a>
+         </div>
+      </div>
+      <div class="hero-logo-large">
+        <AnimatedLogo size="500px" />
+      </div>
     </div>
   </div>
 </section>
@@ -110,7 +116,6 @@
   <div class="container about-container">
     <div class="about-image">
       <div class="image-overlay"></div>
-      <!-- Placeholder for about image or generate one -->
       <div class="about-stats">
         <div class="stat">
           <h4>10+</h4>
@@ -166,7 +171,7 @@
   <div class="container">
     <div class="footer-content">
       <div class="footer-brand">
-        <img src="/lco-brand-logo.svg" alt="Logo" class="logo-img" />
+        <AnimatedLogo size="60px" />
         <span>LCO Systems</span>
       </div>
       <p>&copy; 2026 LCO Systems. Todos os direitos reservados. lco.com.br</p>
@@ -188,7 +193,7 @@
 
   .header.scrolled {
     background: var(--primary);
-    padding: 10px 0;
+    padding: 5px 0;
     box-shadow: 0 10px 30px rgba(0,0,0,0.1);
   }
 
@@ -201,13 +206,7 @@
   .logo-area {
     display: flex;
     align-items: center;
-    gap: 12px;
-  }
-
-  .logo-img {
-    height: 60px;
-    width: auto;
-    object-fit: contain;
+    gap: 0;
   }
 
   .logo-text {
@@ -215,6 +214,7 @@
     font-weight: 700;
     color: var(--text);
     letter-spacing: -1px;
+    margin-left: -10px;
   }
 
   .nav ul {
@@ -242,11 +242,12 @@
   /* Hero */
   .hero {
     position: relative;
-    height: 100vh;
+    min-height: 100vh;
     display: flex;
     align-items: center;
     color: var(--text);
     overflow: hidden;
+    padding-top: 100px;
   }
 
   .hero-bg {
@@ -268,10 +269,18 @@
 
   .hero-content {
     z-index: 1;
+    width: 100%;
+  }
+
+  .hero-layout {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    align-items: center;
+    gap: 40px;
   }
 
   .hero-text h1 {
-    font-size: 4rem;
+    font-size: 4.5rem;
     line-height: 1.1;
     margin-bottom: 20px;
     color: var(--text);
@@ -282,6 +291,12 @@
     max-width: 600px;
     margin-bottom: 40px;
     opacity: 0.9;
+  }
+
+  .hero-logo-large {
+    display: flex;
+    justify-content: center;
+    filter: drop-shadow(0 0 50px rgba(0,0,0,0.5));
   }
 
   .highlight {
@@ -414,7 +429,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: 0;
     margin-bottom: 20px;
     color: white;
     font-weight: 700;
@@ -422,8 +437,11 @@
 
   @media (max-width: 968px) {
     .hero-text h1 { font-size: 3rem; }
+    .hero-layout { grid-template-columns: 1fr; }
+    .hero-logo-large { order: -1; }
     .about-container, .contact-card { grid-template-columns: 1fr; }
     .about-image { height: 300px; margin-bottom: 50px; }
     .header .nav, .header .btn { display: none; }
   }
 </style>
+
